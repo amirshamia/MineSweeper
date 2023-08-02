@@ -1,0 +1,47 @@
+body {
+    background-color: grey;
+    color: white;
+    text-align: center;
+}
+
+.btn{
+    cursor: pointer;
+    background-color: grey;
+}
+
+/* .cell {
+    font-size: 1.5em;
+    width: 2em;
+    height: 2em;
+} */
+.hide{
+    display: none;
+}
+
+
+
+table {
+    margin: auto;
+    width: 350px;
+    height: 350px;
+    border-collapse: collapse;
+  }
+  
+  td {
+    border: 1px solid #ccc;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .hidden{
+  font-size: 0;
+  }
+   
+  footer{
+    margin-top: 5px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  
