@@ -11,11 +11,6 @@ body {
     margin-left: 60px;
 }
 
-/* .cell {
-    font-size: 1.5em;
-    width: 2em;
-    height: 2em;
-} */
 .hide{
     display: none;
 }
@@ -26,6 +21,7 @@ body {
     width: 350px;
     height: 350px;
     border-collapse: collapse;
+    font-size: 20px;
   }
   
   td {
@@ -47,7 +43,11 @@ body {
   
 
   .mark{
-background-color: rgb(38, 38, 38);
+background-color: rgb(244, 32, 32);
+  }
+
+  .markflag{
+    background-color: #131313;
   }
   
 .hint{
@@ -61,6 +61,7 @@ cursor: pointer;
 
 .flag{
   margin-bottom:10px ;
+  margin-right: 30px;
 }
 
 .checked{
@@ -69,4 +70,19 @@ cursor: pointer;
 /* .hints{
 margin-inline-end: 200px;
 } */
+.safe{
+  background-color: blue;
+  border-radius: 30px;
+  margin-left: 150px;
+}
 
+.dark{
+  background-color: #131313;
+  color: yellow;
+}
+.exterminate{
+  background-color: orange;
+  height: 40px;
+  border-radius: 10px;
+  margin-right: 30px;
+}
