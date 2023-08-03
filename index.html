@@ -10,22 +10,40 @@
 </head>
 
 <body onload="onInit()">
-    <h2>lives: <span class="lives"></span></h2>
-    <h2>Score: <span class="score">0</span></h2>
-<button class="btn" onclick="onInit()">😄</button>
-    <table class="board-container">
+
+    <div class="diff">
+        <legend>difficulty</legend>
+
+        <input type="radio" name="level" onclick="begginer()">
+        <label>begginer</label>
+
+        <input type="radio" name="level" onclick="medium()">
+        <label>medium</label>
+
+        <input type="radio" name="level" onclick="expert()">
+        <label>expert</label>
+        <table>
+    </div>
+    <div> 
+        <h2>lives: <span class="lives"> </span></h2> 
+        <h2>Best Score: <span class="score">0</span></h2>
+    </div>
+    <div class="line"> <button class="flag hidden" onclick="reverseFlag()">🚩</button></div>
+    <div>
+        <span class="hints">hint:
+            <span onclick="getHint(this)" class="hint">💡</span>
+            <span onclick="getHint(this)" class="hint">💡</span>
+            <span onclick="getHint(this)" class="hint">💡</span></span>
+        <button class="btn" onclick="onInit()">😄</button>
+        <span class="timer"></span>
+    </div>
+    <table class="myTable">
         <tbody class="board"></tbody>
     </table>
 
-    <!-- <button onclick="playAgain()">Restart</button> -->
-
-    <!-- <div class="modal hide">
-        <button class ="btn" onclick="playAgain()">Play again</button>
-        <h2 class="title"></h2>
-    </div> -->
     <footer>Amir Shamia</footer>
     <script src="js/main.js"></script>
-
+    <script src="js/util.js"></script>
 </body>
 
 </html>

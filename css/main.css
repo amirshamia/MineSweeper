@@ -7,6 +7,8 @@ body {
 .btn{
     cursor: pointer;
     background-color: grey;
+    margin-right: 135px;
+    margin-left: 60px;
 }
 
 /* .cell {
@@ -19,8 +21,7 @@ body {
 }
 
 
-
-table {
+.myTable {
     margin: auto;
     width: 350px;
     height: 350px;
@@ -28,7 +29,7 @@ table {
   }
   
   td {
-    border: 1px solid #ccc;
+    border: 1px solid #2a2a2a;
     cursor: pointer;
     width: 20px;
     height: 20px;
@@ -44,4 +45,28 @@ table {
     font-family: Arial, Helvetica, sans-serif;
   }
   
+
+  .mark{
+background-color: rgb(38, 38, 38);
+  }
   
+.hint{
+cursor: pointer;
+}
+
+.light{
+  background-color: yellow;
+}
+
+
+.flag{
+  margin-bottom:10px ;
+}
+
+.checked{
+  background-color: rgb(219, 219, 219);
+}
+/* .hints{
+margin-inline-end: 200px;
+} */
+

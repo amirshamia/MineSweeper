@@ -4,7 +4,8 @@ const gCell = {
     minesAroundCount: 0,
     isShown: false,
     isMine: false,
-    isMarked: false
+    isMarked: false,
+    isChecked: false
 }
 var gLevel = {
     SIZE: 8,
@@ -18,14 +19,26 @@ const MINE = '💣'
 var gCount = 0
 
 var gLives = 3
+var gFlag = false
+var FlagCount = 0
+var mineCount = 0
+var gHint = false
+var gelHint
+var bestScore = Infinity
+localStorage.bestScore = bestScore
 
 
 
 function onInit() {
-    document.querySelector('.btn').innerText='😄'
-    gGame.isOn=true
-    gBoard = buildBoard()
+    mineCount = gLevel.MINES
+    FlagCount = 0
+    gCount = 0
+    gLives = 3
+    resetVars()
 
+    gGame.isOn = true
+
+    gBoard = buildBoard()
     renderBoard(gBoard)
 }
 
@@ -37,11 +50,6 @@ function buildBoard() {
             board[i][j] = { ...gCell }
         }
     }
-    // for (let x = 0; x < gLevel.MINES; x++) {
-    //     board[getRandomIntInclusive(0, gLevel.SIZE-1)][getRandomIntInclusive(0, gLevel.SIZE-1)].isMine = true
-    // }
-    // board[1][2].isMine = true
-    // board[3][2].isMine = true
     return board
 }
 
@@ -59,14 +67,10 @@ function setMinesNegsCount(board) {
                 }
                 board[a][b].minesAroundCount = count
             }
-
-
-
         }
     }
     console.log(board);
 }
-
 
 function renderBoard(board) {
     var strHTML = ''
@@ -81,75 +85,115 @@ function renderBoard(board) {
 
             else {
                 cell = board[i][j].minesAroundCount
+                if (cell === 0) cell = ''
                 className = `hidden cell cell-${i}-${j}`
             }
-            const elCell = document.querySelector(`.cell-${i}-${j}`)
-            console.log(elCell);
-            strHTML += `<td onclick="onCellClicked(this,${i},${j})" class="${className}">${cell}</td>`
+
+
+            strHTML += `<td id="rightClickElement-${i}-${j}" onclick="onCellClicked(this,${i},${j})" class="${className}">${cell}</td>`
 
         }
+
         strHTML += '</tr>'
     }
     const elContainer = document.querySelector('.board')
     elContainer.innerHTML = strHTML
-    //console.log(strHTML);
+    // console.log(board);
 }
 
 function onCellClicked(elCell, i, j) {
-    if(gGame.isOn===false)return
-
+    if (!gGame.isOn) return
     gCount++
     if (gCount === 1) {
+        startStopwatch()
         for (let x = 0; x < gLevel.MINES; x++) {
             gBoard[getRandomIntInclusive(0, gLevel.SIZE - 1)][getRandomIntInclusive(0, gLevel.SIZE - 1)].isMine = true
-            setMinesNegsCount(gBoard)
-            renderBoard(gBoard)
+            document.querySelector('.flag').classList.remove('hidden')
+        }
+        setMinesNegsCount(gBoard)
+        renderBoard(gBoard)
+    }
+    if (gHint) Hint(i, j, gBoard)
+    else {
+        if (gFlag)  onCellMarked(elCell, i, j) 
+        else {
+            if (gBoard[i][j].isMarked) return
+            if (elCell.innerText === ''&&gCount!==1) expandShown(gBoard, i, j)
+            if (!gBoard[i][j].isMine) elCell.classList.remove('hidden')
+            else {
+                mineCount--
+                elCell.style.backgroundColor = 'red'
+                elCell.classList.remove('hidden')
+                gLives--
+                if (gLives == 0) gameOver()
+            }
+            document.querySelector('h2 .lives').innerText = gLives
         }
     }
-    console.log(elCell.innerText);
-    if (elCell.innerText === '0') expandShown(gBoard, elCell, i, j)
-    if (!gBoard[i][j].isMine) {
-        elCell.classList.remove('hidden')
-    }
-    else{
-        elCell.style.backgroundColor='red'
-        elCell.classList.remove('hidden')
-        gLives--
-        if(gLives==0) gameOver()
-    } 
-document.querySelector('h2 .lives').innerText=gLives
 }
 
-// function onCellMarked(elCell)
-function expandShown(board, elCell, rowIdx, colIdx) {
-    var cells = []
-    var checkcell = { i: 0, j: 0 }
-    console.log('hi');
+function onCellMarked(elCell, i, j) {
+
+    if (!gBoard[i][j].isMarked) {
+        elCell.classList.remove('hidden')
+        elCell.innerText = '🚩'
+        gBoard[i][j].isMarked = true
+        FlagCount++
+    }
+    else {
+        elCell.classList.add('hidden')
+        if (gBoard[i][j].isMine) elCell.innerText = '💣'
+        else elCell.innerText = gBoard[i][j].minesAroundCount ? gBoard[i][j].minesAroundCount : ''
+        gBoard[i][j].isMarked = false
+        FlagCount--
+    }
+    checkVictory(gBoard)
+}
+function expandShown(board, rowIdx, colIdx) {
+    console.log(rowIdx);
+    board[rowIdx][colIdx].isChecked=true
     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
         if (i < 0 || i > board.length - 1) continue
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
-            if (j < 0 || j > gBoard[0].length - 1) continue
+            if (j < 0 || j > board[0].length - 1) continue
             if (i === rowIdx && j === colIdx) continue
-            if (board[i][j].minesAroundCount !== 0) {
+            //board[i][j].isChecked=true
+            //console.log(board[i][j]);
+            if (board[i][j].minesAroundCount !== 0 && !board[i][j].isMine) {
+              
                 const elCel = document.querySelector(`.cell-${i}-${j}`)
-                console.log(elCel);
                 elCel.classList.remove('hidden')
             }
-            else {
-                checkcell.i = i
-                checkcell.j = j
-                cells.push({ ...checkcell })
-            }
-
-
+            else if(!board[i][j].isChecked) expandShown(board,i,j);
+            else document.querySelector(`.cell-${i}-${j}`).classList.add('checked')
         }
-        // for (let x = 0; x < cells.length; x++) {
-        //     i=cells[x].i
-        //     j=cells[x].j
-        //     expandShown(board, elCell, i, j)
-        // }
     }
-    console.log(cells);
+
+}
+
+
+
+
+
+
+function checkVictory(board) {
+    var currScore = 0
+
+    var Markcount = 0
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board.length; j++) {
+            if (gBoard[i][j].isMarked && gBoard[i][j].isMine) Markcount++
+        }
+    }
+    if (FlagCount === Markcount && FlagCount === mineCount) {
+        document.querySelector('.btn').innerText = '😎'
+        gGame.isOn = false
+        clearInterval(gIntervalId)
+        currScore = gGame.secsPassed
+        if (currScore < bestScore) localStorage.bestScore = currScore
+        // localStorage.getItem("bestScore")
+        document.querySelector('.score').innerText = localStorage.getItem("bestScore");
+    }
 }
 
 
@@ -158,11 +202,39 @@ function gameOver() {
     for (let i = 0; i < elBomb.length; i++) {
         elBomb[i].classList.remove('hidden')
     }
-    document.querySelector('.btn').innerText='😩'
-    gGame.isOn=false
+    clearInterval(gIntervalId)
+    document.querySelector('.btn').innerText = '😩'
+    gGame.isOn = false
 }
 
 
-function getRandomIntInclusive(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min
+function getHint(elHint) {
+    gHint = true
+    gelHint = elHint
+    gelHint.classList.add('light')
+}
+
+function Hint(rowIdx, colIdx, board) {
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i > board.length - 1) continue
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (j < 0 || j > gBoard[0].length - 1) continue
+            if (i === rowIdx && j === colIdx) continue
+            const elCel = document.querySelector(`.cell-${i}-${j}`)
+            elCel.classList.remove('hidden')
+        }
+    }
+    setTimeout(() => {
+        for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+            if (i < 0 || i > board.length - 1) continue
+            for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+                if (j < 0 || j > gBoard[0].length - 1) continue
+                if (i === rowIdx && j === colIdx) continue
+                const elCel = document.querySelector(`.cell-${i}-${j}`)
+                elCel.classList.add('hidden')
+            }
+        }
+        gelHint.classList.add('hide')
+    }, 1000);
+    gHint = false
 }
